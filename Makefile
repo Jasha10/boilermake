@@ -40,6 +40,13 @@ define ADD_CLEAN_RULE
 	$$(strip rm -f ${TARGET_DIR}/${1} $${${1}_OBJS:%.o=%.[doP]})
 	$${${1}_POSTCLEAN}
 endef
+define ADD_MOSTLYCLEAN_RULE
+    mostlyclean: mostlyclean_${1}
+    .PHONY: mostlyclean_${1}
+    mostlyclean_${1}:
+	$$(strip rm -f ${TARGET_DIR}/${1} $${${1}_OBJS:%.o=%.[doP]})
+	$${${1}_POSTCLEAN}
+endef
 
 # ADD_OBJECT_RULE - Parameterized "function" that adds a pattern rule for
 #   building object files from source files with the filename extension
@@ -378,6 +385,9 @@ $(foreach TGT,${ALL_TGTS},\
 .PHONY: clean
 $(foreach TGT,${ALL_TGTS},\
   $(eval $(call ADD_CLEAN_RULE,${TGT})))
+.PHONY: mostlyclean
+$(foreach TGT,$(filter-out %.a,${ALL_TGTS}),\
+  $(eval $(call ADD_MOSTLYCLEAN_RULE,${TGT})))
 
 # Include generated rules that define additional (header) dependencies.
 $(foreach TGT,${ALL_TGTS},\
