@@ -237,6 +237,7 @@ define INCLUDE_SUBMAKEFILE
         # Qualify and canonicalize paths.
         SOURCES     := $$(call QUALIFY_PATH,$${DIR},$${SOURCES})
         SOURCES     := $$(call CANONICAL_PATH,$${SOURCES})
+        SOURCES     := $$(wildcard $${SOURCES})
         SRC_INCDIRS := $$(call QUALIFY_PATH,$${DIR},$${SRC_INCDIRS})
         SRC_INCDIRS := $$(call CANONICAL_PATH,$${SRC_INCDIRS})
 
