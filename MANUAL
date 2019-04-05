@@ -147,6 +147,11 @@ TARGET_DIR
 
    Default value: . (make's working directory; aka project root)
 
+TGT_AR
+------
+   Specifies the program to be used for creating static libraries. If this
+    option is not specified, AR is used.
+
 TGT_CC
 ------
    Specifies the program to be used for compiling C sources. If this option is

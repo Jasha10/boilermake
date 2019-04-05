@@ -68,7 +68,7 @@ define ADD_TARGET_RULE
         # Add a target for creating a static library.
         $${TARGET_DIR}/${1}: $${${1}_OBJS}
 	    @mkdir -p $$(dir $$@)
-	    $$(strip $${AR} $${ARFLAGS} $$@ $${${1}_OBJS})
+	    $$(strip $${${1}_AR} $${ARFLAGS} $$@ $${${1}_OBJS})
 	    $${${1}_POSTMAKE}
     else
         # Add a target for linking an executable. First, attempt to select the
@@ -139,6 +139,7 @@ define INCLUDE_SUBMAKEFILE
     # Initialize all variables that can be defined by a makefile fragment, then
     # include the specified makefile fragment.
     TARGET        :=
+    TGT_AR        :=
     TGT_CC        :=
     TGT_CFLAGS    :=
     TGT_CXX       :=
@@ -187,6 +188,7 @@ define INCLUDE_SUBMAKEFILE
         # makefile apply to this new target. Initialize the target's variables.
         TGT := $$(strip $${TARGET})
         ALL_TGTS += $${TGT}
+        $${TGT}_AR        := $$(if $${TGT_AR},$${TGT_AR},$${AR})
         $${TGT}_CC        := $$(if $${TGT_CC},$${TGT_CC},$${CC})
         $${TGT}_CFLAGS    := $${TGT_CFLAGS}
         $${TGT}_CXX       := $$(if $${TGT_CXX},$${TGT_CXX},$${CXX})
