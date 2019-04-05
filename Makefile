@@ -75,7 +75,7 @@ define ADD_TARGET_RULE
         # Add a target for creating a static library.
         $${TARGET_DIR}/${1}: $${${1}_OBJS}
 	    @mkdir -p $$(dir $$@)
-	    $$(strip $${${1}_AR} $${ARFLAGS} $$@ $${${1}_OBJS})
+	    $$(strip @$${${1}_AR} $${ARFLAGS} $$@ $${${1}_OBJS})
 	    $${${1}_POSTMAKE}
     else
         # Add a target for linking an executable. First, attempt to select the
@@ -96,7 +96,8 @@ define ADD_TARGET_RULE
 
         $${TARGET_DIR}/${1}: $${${1}_OBJS} $${${1}_PREREQS}
 	    @mkdir -p $$(dir $$@)
-	    $$(strip $${${1}_LINKER} -o $$@ $${LDFLAGS} $${${1}_LDFLAGS} \
+	    @echo $${${1}_LINKER} -o $$@
+	    $$(strip @$${${1}_LINKER} -o $$@ $${LDFLAGS} $${${1}_LDFLAGS} \
 	        $${${1}_OBJS} $${LDLIBS} $${${1}_LDLIBS})
 	    $${${1}_POSTMAKE}
     endif
@@ -115,7 +116,8 @@ endef
 # COMPILE_C_CMDS - Commands for compiling C source code.
 define COMPILE_C_CMDS
 	@mkdir -p $(dir $@)
-	$(strip ${CC} -o $@ -c -MD ${CFLAGS} ${SRC_CFLAGS} ${INCDIRS} \
+    @echo ${CC} $(lastword $(filter -O%, ${CFLAGS} ${SRC_CFLAGS})) $<
+	$(strip @${CC} -o $@ -c -MD ${CFLAGS} ${SRC_CFLAGS} ${INCDIRS} \
 	    ${SRC_INCDIRS} ${SRC_DEFS} ${DEFS} $<)
 	@cp ${@:%$(suffix $@)=%.d} ${@:%$(suffix $@)=%.P}; \
 	 sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
@@ -127,7 +129,8 @@ endef
 # COMPILE_CXX_CMDS - Commands for compiling C++ source code.
 define COMPILE_CXX_CMDS
 	@mkdir -p $(dir $@)
-	$(strip ${CXX} -o $@ -c -MD ${CXXFLAGS} ${SRC_CXXFLAGS} ${INCDIRS} \
+    @echo ${CXX} $(lastword $(filter -O%, ${CXXFLAGS} ${SRC_CXXFLAGS})) $<
+	$(strip @${CXX} -o $@ -c -MD ${CXXFLAGS} ${SRC_CXXFLAGS} ${INCDIRS} \
 	    ${SRC_INCDIRS} ${SRC_DEFS} ${DEFS} $<)
 	@cp ${@:%$(suffix $@)=%.d} ${@:%$(suffix $@)=%.P}; \
 	 sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
