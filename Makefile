@@ -81,9 +81,9 @@ define ADD_TARGET_RULE
             # there are any C++ sources for this target, use the C++ compiler.
             # For all other targets, default to using the C compiler.
             ifneq "$$(strip $$(filter $${CXX_SRC_EXTS},$${${1}_SOURCES}))" ""
-                ${1}_LINKER = $${CXX}
+                ${1}_LINKER = $${${1}_CXX}
             else
-                ${1}_LINKER = $${CC}
+                ${1}_LINKER = $${${1}_CC}
             endif
         endif
 
@@ -187,9 +187,9 @@ define INCLUDE_SUBMAKEFILE
         # makefile apply to this new target. Initialize the target's variables.
         TGT := $$(strip $${TARGET})
         ALL_TGTS += $${TGT}
-        $${TGT}_CC        := $${TGT_CC}
+        $${TGT}_CC        := $$(if $${TGT_CC},$${TGT_CC},$${CC})
         $${TGT}_CFLAGS    := $${TGT_CFLAGS}
-        $${TGT}_CXX       := $${TGT_CXX}
+        $${TGT}_CXX       := $$(if $${TGT_CXX},$${TGT_CXX},$${CXX})
         $${TGT}_CXXFLAGS  := $${TGT_CXXFLAGS}
         $${TGT}_DEFS      := $${TGT_DEFS}
         $${TGT}_DEPS      :=
@@ -251,8 +251,8 @@ define INCLUDE_SUBMAKEFILE
         # variables that were defined.
         $${TGT}_OBJS += $${OBJS}
         $${TGT}_DEPS += $${OBJS:%.o=%.P}
-        $${OBJS}: CC           := $$(if $${$${TGT}_CC},$${$${TGT}_CC},$${CC})
-        $${OBJS}: CXX          := $$(if $${$${TGT}_CXX},$${$${TGT}_CXX},$${CXX})
+        $${OBJS}: CC           := $${$${TGT}_CC}
+        $${OBJS}: CXX          := $${$${TGT}_CXX}
         $${OBJS}: SRC_CFLAGS   := $${$${TGT}_CFLAGS} $${SRC_CFLAGS}
         $${OBJS}: SRC_CXXFLAGS := $${$${TGT}_CXXFLAGS} $${SRC_CXXFLAGS}
         $${OBJS}: SRC_DEFS     := $$(addprefix -D,$${$${TGT}_DEFS} $${SRC_DEFS})
