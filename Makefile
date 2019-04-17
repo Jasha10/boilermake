@@ -139,6 +139,20 @@ define COMPILE_CXX_CMDS
 	 rm -f ${@:%$(suffix $@)=%.d}
 endef
 
+# COMPILE_ASM_CMDS - Commands for compiling assembly source code.
+define COMPILE_ASM_CMDS
+	@mkdir -p $(dir $@)
+    @echo ${CC} $<
+	$(strip @${CC} -o $@ -c -MD -x assembler-with-cpp \
+	    ${CFLAGS} ${SRC_CFLAGS} \
+	    ${INCDIRS} ${SRC_INCDIRS} ${SRC_DEFS} ${DEFS} $<)
+	@cp ${@:%$(suffix $@)=%.d} ${@:%$(suffix $@)=%.P}; \
+	 sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	     -e '/^$$/ d' -e 's/$$/ :/' < ${@:%$(suffix $@)=%.d} \
+	     >> ${@:%$(suffix $@)=%.P}; \
+	 rm -f ${@:%$(suffix $@)=%.d}
+endef
+
 # INCLUDE_SUBMAKEFILE - Parameterized "function" that includes a new
 #   "submakefile" fragment into the overall Makefile. It also recursively
 #   includes all submakefiles of the specified submakefile fragment.
@@ -346,7 +360,8 @@ endif
 # Define the source file extensions that we know how to handle.
 C_SRC_EXTS := %.c
 CXX_SRC_EXTS := %.C %.cc %.cp %.cpp %.CPP %.cxx %.c++
-ALL_SRC_EXTS := ${C_SRC_EXTS} ${CXX_SRC_EXTS}
+ASM_SRC_EXTS := %.s %.S %.asm
+ALL_SRC_EXTS := ${C_SRC_EXTS} ${CXX_SRC_EXTS} ${ASM_SRC_EXTS}
 
 # Initialize global variables.
 ALL_TGTS :=
@@ -383,6 +398,12 @@ $(foreach TGT,${ALL_TGTS},\
   $(foreach EXT,${CXX_SRC_EXTS},\
     $(eval $(call ADD_OBJECT_RULE,${BUILD_DIR}/$(call CANONICAL_PATH,${TGT}),\
              ${EXT},$${COMPILE_CXX_CMDS}))))
+
+# Add pattern rule(s) for creating compiled object code from assembly source.
+$(foreach TGT,${ALL_TGTS},\
+  $(foreach EXT,${ASM_SRC_EXTS},\
+    $(eval $(call ADD_OBJECT_RULE,${BUILD_DIR}/$(call CANONICAL_PATH,${TGT}),\
+             ${EXT},$${COMPILE_ASM_CMDS}))))
 
 # Add "clean" rules to remove all build-generated files.
 .PHONY: clean

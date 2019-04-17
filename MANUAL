@@ -65,12 +65,14 @@ SOURCES
    as the SOURCES variable, or it may be a target specified in some ancestor
    makefile).
 
-   Currently supported sources are C and C++ sources ending with any of the
-   following filename extensions:
+   Currently supported sources are C, C++, and assembly sources ending with any
+   of the following filename extensions:
 
      For C sources: .c
 
      For C++ sources: .C .cc .cp .cpp .CPP .cxx .c++
+
+     For assembly sources: .s .S .asm
 
 SRC_CFLAGS
 ----------
